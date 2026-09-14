@@ -22,13 +22,14 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('home')
   const [flow, setFlow] = useState<Flow>(null)
   const [tracks, setTracks] = useState<Track[]>([])
-  const [tracksError, setTracksError] = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/audio/tracks.json', { cache: 'no-cache' })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`tracks.json: ${r.status}`))))
       .then((j: { tracks?: Track[] }) => setTracks(Array.isArray(j.tracks) ? j.tracks.filter((t) => t.id && t.file) : []))
-      .catch((e: Error) => setTracksError(`tracks.json を読み込めませんでした（${e.message}）`))
+      .catch(() => {
+        /* 内蔵音のみで動作 */
+      })
   }, [])
 
   const settingsForPlay = useMemo<Settings | null>(() => {
@@ -123,7 +124,6 @@ export default function App() {
           <SettingsView
             data={data}
             tracks={tracks}
-            tracksError={tracksError}
             onChange={(s) => setData({ ...data, settings: s })}
             onImport={(d: AppData) => setData(d)}
             onReset={() => setData(emptyData())}

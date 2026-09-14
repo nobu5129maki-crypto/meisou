@@ -8,13 +8,12 @@ import { InstallHint } from './InstallHint'
 type Props = {
   data: AppData
   tracks: Track[]
-  tracksError: string | null
   onChange: (s: Settings) => void
   onImport: (d: AppData) => void
   onReset: () => void
 }
 
-export function SettingsView({ data, tracks, tracksError, onChange, onImport, onReset }: Props) {
+export function SettingsView({ data, tracks, onChange, onImport, onReset }: Props) {
   const s = data.settings
   const [previewing, setPreviewing] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
@@ -165,26 +164,6 @@ export function SettingsView({ data, tracks, tracksError, onChange, onImport, on
               試聴を止める
             </button>
           )}
-        </div>
-      </section>
-
-      <section className="card">
-        <h3>自分の音楽を追加する（Suno など）</h3>
-        {tracksError && <div className="notice warn">{tracksError}</div>}
-        <ol className="steps">
-          <li>
-            MP3 を <code>public/audio/</code> に置く（例: <code>public/audio/forest.mp3</code>）
-          </li>
-          <li>
-            <code>public/audio/tracks.json</code> の <code>tracks</code> に追記:
-            <pre>{`{ "id": "forest", "title": "森の朝", "file": "/audio/forest.mp3",
-  "loopStart": 8, "loopEnd": 172, "crossfade": 6, "gain": 0.8 }`}</pre>
-          </li>
-          <li>再読み込みすると、環境音の一覧に「🎧 森の朝」が現れます</li>
-        </ol>
-        <div className="hint">
-          loopStart / loopEnd（秒）でイントロ・アウトロを避け、crossfade（秒）で曲末と曲頭を重ねてつなぎ目を消します。gain は曲ごとの音量補正。
-          現在 {tracks.length} 曲を読み込み中{tracks.length > 0 && `: ${tracks.map((t) => t.title).join('、')}`}。
         </div>
       </section>
 
