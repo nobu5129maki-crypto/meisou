@@ -3,6 +3,7 @@ import type { AppData, Settings, Track } from '../types'
 import { BUILTIN_SOUNDS, audio } from '../lib/audio'
 import { speak, speechSupported, stopSpeaking } from '../lib/speech'
 import { exportJson, importJson } from '../lib/storage'
+import { InstallHint } from './InstallHint'
 
 type Props = {
   data: AppData
@@ -64,6 +65,7 @@ export function SettingsView({ data, tracks, tracksError, onChange, onImport, on
   return (
     <div className="screen settings">
       <h1>設定</h1>
+      <InstallHint compact />
 
       <section className="card">
         <h3>あなた</h3>

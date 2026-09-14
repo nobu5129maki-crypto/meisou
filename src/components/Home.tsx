@@ -3,6 +3,7 @@ import { PROGRAMS } from '../data/programs'
 import { quoteOfTheDay } from '../data/quotes'
 import { currentStreak, formatMinutes, greeting, levelInfo, timeOfDay, todaySeconds, totalSeconds } from '../lib/stats'
 import { ProgressRing } from './ProgressRing'
+import { InstallHint } from './InstallHint'
 
 type Props = {
   data: AppData
@@ -70,6 +71,8 @@ export function Home({ data, onSelect }: Props) {
         <div className="quote-label">達人からのひとこと</div>
         <p>{quoteOfTheDay()}</p>
       </section>
+
+      <InstallHint />
 
       <section>
         <h2 className="section-title">いまのおすすめ</h2>

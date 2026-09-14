@@ -9,6 +9,15 @@
       "loopEnd": 198,
       "crossfade": 6,
       "gain": 0.8
+    },
+    {
+      "id": "seijaku2",
+      "title": "静寂への旅 II",
+      "file": "/audio/seijaku-no-tabi-2.mp3",
+      "loopStart": 0,
+      "loopEnd": 218,
+      "crossfade": 6,
+      "gain": 0.8
     }
   ]
 }
