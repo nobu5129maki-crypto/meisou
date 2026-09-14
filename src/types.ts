@@ -56,6 +56,10 @@ export type Track = {
   file: string
   loopStart?: number
   loopEnd?: number
+  /** ループのつなぎ目をクロスフェードする秒数（既定 4） */
+  crossfade?: number
+  /** 曲ごとの音量補正（既定 1） */
+  gain?: number
 }
 
 export type AppData = {

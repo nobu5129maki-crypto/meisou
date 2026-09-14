@@ -1,5 +1,14 @@
 {
-  "_説明": "Suno などで作った MP3 をこのフォルダ (public/audio/) に置き、下の tracks に追加すると、アプリの『環境音』で選べるようになります。loopStart / loopEnd (秒) を指定すると、イントロ・アウトロを避けてつなぎ目なくループできます。",
+  "_説明": "Suno などで作った MP3 をこのフォルダ (public/audio/) に置き、下の tracks に追加すると、アプリの『環境音』で選べるようになります。loopStart / loopEnd (秒) でイントロ・アウトロを避け、crossfade (秒) でつなぎ目を重ねて自然にループします。gain は曲ごとの音量補正 (1 が等倍)。",
   "tracks": [
+    {
+      "id": "seijaku",
+      "title": "静寂への旅",
+      "file": "/audio/seijaku-no-tabi.mp3",
+      "loopStart": 0,
+      "loopEnd": 208,
+      "crossfade": 6,
+      "gain": 0.8
+    }
   ]
 }

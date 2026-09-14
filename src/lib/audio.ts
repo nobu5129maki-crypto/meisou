@@ -15,6 +15,7 @@ type Playing = {
   gain: GainNode
   nodes: AudioNode[]
   sources: (AudioBufferSourceNode | OscillatorNode)[]
+  timer?: ReturnType<typeof setInterval>
 }
 
 class AudioEngine {
@@ -23,6 +24,7 @@ class AudioEngine {
   private playing: Playing | null = null
   private bufferCache = new Map<string, AudioBuffer>()
   private noiseCache = new Map<string, AudioBuffer>()
+  private startToken = 0
 
   private ensure() {
     if (!this.ctx) {
@@ -135,7 +137,8 @@ class AudioEngine {
   }
 
   /** 環境音を開始。soundId は内蔵 ID か `track:<id>` */
-  async start(soundId: string, tracks: Track[], volume: number) {
+  async start(soundId: string, tracks: Track[], volume: number): Promise<void> {
+    this.startToken++
     this.stop(0.6)
     if (soundId === 'none') return
     const { ctx, master } = this.ensure()
@@ -144,20 +147,28 @@ class AudioEngine {
     gain.connect(master)
     const nodes: AudioNode[] = [gain]
     const sources: (AudioBufferSourceNode | OscillatorNode)[] = []
+    let timer: ReturnType<typeof setInterval> | undefined
 
     if (soundId.startsWith('track:')) {
       const id = soundId.slice('track:'.length)
       const track = tracks.find((t) => t.id === id)
-      if (!track) return
+      if (!track) {
+        // 登録が見つからない場合は内蔵の雨音にフォールバック
+        gain.disconnect()
+        return this.start('rain', tracks, volume)
+      }
+      const token = this.startToken
       const buf = await this.trackBuffer(track)
-      const src = ctx.createBufferSource()
-      src.buffer = buf
-      src.loop = true
-      if (track.loopStart != null) src.loopStart = track.loopStart
-      if (track.loopEnd != null) src.loopEnd = track.loopEnd
-      src.connect(gain)
-      src.start(0, track.loopStart ?? 0)
-      sources.push(src)
+      // 読み込み中に別の音へ切り替えられた場合は破棄
+      if (this.playing || token !== this.startToken) {
+        gain.disconnect()
+        return
+      }
+      const trackGain = ctx.createGain()
+      trackGain.gain.value = track.gain ?? 1
+      trackGain.connect(gain)
+      nodes.push(trackGain)
+      timer = this.scheduleCrossfadeLoop(buf, track, trackGain, sources, nodes)
     } else if (soundId === 'rain') {
       const body = this.noiseSource('pink')
       const lp = ctx.createBiquadFilter()
@@ -242,7 +253,57 @@ class AudioEngine {
     }
 
     gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 2.5)
-    this.playing = { gain, nodes, sources }
+    this.playing = { gain, nodes, sources, timer }
+  }
+
+  /**
+   * 曲をクロスフェードでつなぎながらループ再生する。
+   * loopStart〜loopEnd の区間を、終わりの crossfade 秒と次の始まりの crossfade 秒を重ねて再生。
+   */
+  private scheduleCrossfadeLoop(
+    buf: AudioBuffer,
+    track: Track,
+    out: GainNode,
+    sources: (AudioBufferSourceNode | OscillatorNode)[],
+    nodes: AudioNode[],
+  ) {
+    const { ctx } = this.ensure()
+    const start = Math.max(0, track.loopStart ?? 0)
+    const end = Math.min(buf.duration, track.loopEnd ?? buf.duration)
+    const segLen = Math.max(1, end - start)
+    const xf = Math.min(track.crossfade ?? 4, segLen / 3)
+    let nextAt = ctx.currentTime + 0.05
+    let first = true
+
+    const schedule = () => {
+      // 常に 8 秒先まで予約しておく
+      while (nextAt < ctx.currentTime + 8) {
+        const src = ctx.createBufferSource()
+        src.buffer = buf
+        const g = ctx.createGain()
+        const t0 = nextAt
+        if (first) {
+          g.gain.setValueAtTime(1, t0)
+          first = false
+        } else {
+          g.gain.setValueAtTime(0, t0)
+          g.gain.linearRampToValueAtTime(1, t0 + xf)
+        }
+        g.gain.setValueAtTime(1, t0 + segLen - xf)
+        g.gain.linearRampToValueAtTime(0, t0 + segLen)
+        src.connect(g).connect(out)
+        src.start(t0, start, segLen)
+        src.onended = () => {
+          src.disconnect()
+          g.disconnect()
+        }
+        sources.push(src)
+        nodes.push(g)
+        nextAt = t0 + segLen - xf
+      }
+    }
+    schedule()
+    return setInterval(schedule, 2000)
   }
 
   setVolume(volume: number) {
@@ -255,6 +316,7 @@ class AudioEngine {
     const p = this.playing
     if (!p || !this.ctx) return
     this.playing = null
+    if (p.timer) clearInterval(p.timer)
     const now = this.ctx.currentTime
     p.gain.gain.cancelScheduledValues(now)
     p.gain.gain.setValueAtTime(p.gain.gain.value, now)

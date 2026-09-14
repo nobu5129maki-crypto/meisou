@@ -9,7 +9,7 @@ export const DEFAULT_SETTINGS: Settings = {
   freeMinutes: 10,
   bell: true,
   voice: false,
-  soundId: 'rain',
+  soundId: 'track:seijaku',
   volume: 0.5,
 }
 

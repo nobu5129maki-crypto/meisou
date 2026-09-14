@@ -176,12 +176,13 @@ export function SettingsView({ data, tracks, tracksError, onChange, onImport, on
           <li>
             <code>public/audio/tracks.json</code> の <code>tracks</code> に追記:
             <pre>{`{ "id": "forest", "title": "森の朝", "file": "/audio/forest.mp3",
-  "loopStart": 8, "loopEnd": 172 }`}</pre>
+  "loopStart": 8, "loopEnd": 172, "crossfade": 6, "gain": 0.8 }`}</pre>
           </li>
           <li>再読み込みすると、環境音の一覧に「🎧 森の朝」が現れます</li>
         </ol>
         <div className="hint">
-          loopStart / loopEnd（秒）は任意。イントロ・アウトロを避けると、つなぎ目が自然にループします。現在 {tracks.length} 曲を読み込み中。
+          loopStart / loopEnd（秒）でイントロ・アウトロを避け、crossfade（秒）で曲末と曲頭を重ねてつなぎ目を消します。gain は曲ごとの音量補正。
+          現在 {tracks.length} 曲を読み込み中{tracks.length > 0 && `: ${tracks.map((t) => t.title).join('、')}`}。
         </div>
       </section>
 
