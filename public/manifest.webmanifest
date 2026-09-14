@@ -1,0 +1,13 @@
+{
+  "name": "めいそう - 続けたくなる瞑想",
+  "short_name": "めいそう",
+  "description": "続けるのが楽しくなる瞑想アプリ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1424",
+  "theme_color": "#0f1424",
+  "lang": "ja",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
