@@ -126,6 +126,24 @@
       "loopEnd": 219,
       "crossfade": 6,
       "gain": 0.8
+    },
+    {
+      "id": "tranquil",
+      "title": "トランキルフォーカス",
+      "file": "/audio/tranquil-focus.mp3",
+      "loopStart": 0,
+      "loopEnd": 233,
+      "crossfade": 6,
+      "gain": 0.8
+    },
+    {
+      "id": "tranquil2",
+      "title": "トランキルフォーカス II",
+      "file": "/audio/tranquil-focus-2.mp3",
+      "loopStart": 0,
+      "loopEnd": 219,
+      "crossfade": 6,
+      "gain": 0.8
     }
   ]
 }
