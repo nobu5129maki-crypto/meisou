@@ -18,6 +18,42 @@
       "loopEnd": 218,
       "crossfade": 6,
       "gain": 0.8
+    },
+    {
+      "id": "kalimba",
+      "title": "カリンバ",
+      "file": "/audio/kalimba.mp3",
+      "loopStart": 0,
+      "loopEnd": 172,
+      "crossfade": 6,
+      "gain": 0.8
+    },
+    {
+      "id": "kalimba2",
+      "title": "カリンバ II",
+      "file": "/audio/kalimba-2.mp3",
+      "loopStart": 0,
+      "loopEnd": 173,
+      "crossfade": 6,
+      "gain": 0.8
+    },
+    {
+      "id": "kalimba3",
+      "title": "カリンバ III",
+      "file": "/audio/kalimba-3.mp3",
+      "loopStart": 0,
+      "loopEnd": 134,
+      "crossfade": 6,
+      "gain": 0.8
+    },
+    {
+      "id": "kalimba4",
+      "title": "カリンバ IV",
+      "file": "/audio/kalimba-4.mp3",
+      "loopStart": 0,
+      "loopEnd": 158,
+      "crossfade": 6,
+      "gain": 0.8
     }
   ]
 }
