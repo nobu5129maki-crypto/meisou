@@ -74,39 +74,21 @@
       "gain": 0.75
     },
     {
-      "id": "crystal3",
-      "title": "クリスタルボール III",
-      "file": "/audio/crystal-bowl-3.mp3",
+      "id": "crystal",
+      "title": "クリスタルボール",
+      "file": "/audio/crystal-bowl-1.mp3",
       "loopStart": 0,
-      "loopEnd": 217,
+      "loopEnd": 154,
       "crossfade": 6,
       "gain": 0.75
     },
     {
-      "id": "crystal4",
-      "title": "クリスタルボール IV",
-      "file": "/audio/crystal-bowl-4.mp3",
+      "id": "crystal2",
+      "title": "クリスタルボール II",
+      "file": "/audio/crystal-bowl-2.mp3",
       "loopStart": 0,
-      "loopEnd": 232,
+      "loopEnd": 163,
       "crossfade": 6,
-      "gain": 0.75
-    },
-    {
-      "id": "tibetan",
-      "title": "チベタン・シンギングボウル",
-      "file": "/audio/tibetan-bowl.mp3",
-      "loopStart": 0,
-      "loopEnd": 354,
-      "crossfade": 8,
-      "gain": 0.75
-    },
-    {
-      "id": "tibetan2",
-      "title": "チベタン・シンギングボウル II",
-      "file": "/audio/tibetan-bowl-2.mp3",
-      "loopStart": 0,
-      "loopEnd": 318,
-      "crossfade": 8,
       "gain": 0.75
     },
     {
