@@ -108,6 +108,24 @@
       "loopEnd": 232,
       "crossfade": 6,
       "gain": 0.75
+    },
+    {
+      "id": "warmpad",
+      "title": "ウォームアナログパッド",
+      "file": "/audio/warm-analog-pad.mp3",
+      "loopStart": 0,
+      "loopEnd": 218,
+      "crossfade": 6,
+      "gain": 0.8
+    },
+    {
+      "id": "warmpad2",
+      "title": "ウォームアナログパッド II",
+      "file": "/audio/warm-analog-pad-2.mp3",
+      "loopStart": 0,
+      "loopEnd": 219,
+      "crossfade": 6,
+      "gain": 0.8
     }
   ]
 }
