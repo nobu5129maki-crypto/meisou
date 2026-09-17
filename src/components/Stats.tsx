@@ -166,7 +166,13 @@ export function Stats({ data, onDelete }: Props) {
                   </div>
                   {r.note && <div className="rec-note">{r.note}</div>}
                 </div>
-                <button className="icon-btn" aria-label="削除" onClick={() => onDelete(r.id)}>
+                <button
+                  className="icon-btn"
+                  aria-label="削除"
+                  onClick={() => {
+                    if (confirm(`${p.title}（${formatMinutes(r.durationSec)}）の記録を削除しますか？`)) onDelete(r.id)
+                  }}
+                >
                   ×
                 </button>
               </li>

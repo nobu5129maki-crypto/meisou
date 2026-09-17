@@ -26,7 +26,8 @@ const PRAISES = [
 export function Complete({ program, elapsedSec, moodBefore, streak, todaySec, goalSec, newBadges, onSave }: Props) {
   const [mood, setMood] = useState<number | undefined>()
   const [note, setNote] = useState('')
-  const praise = PRAISES[Math.floor(Math.random() * PRAISES.length)]
+  // 再描画で文言が変わらないよう初回に一度だけ選ぶ
+  const [praise] = useState(() => PRAISES[Math.floor(Math.random() * PRAISES.length)])
   const goalMet = todaySec >= goalSec
   const delta = mood != null && moodBefore != null ? mood - moodBefore : null
 

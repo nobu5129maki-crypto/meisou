@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Program, Settings, Track } from '../types'
-import { BUILTIN_SOUNDS } from '../lib/audio'
+import { BUILTIN_SOUNDS, audio } from '../lib/audio'
 import { MoodPicker } from './MoodPicker'
 
 type Props = {
@@ -17,6 +17,13 @@ export function Prepare({ program, settings, tracks, onStart, onBack }: Props) {
   const [mood, setMood] = useState<number | undefined>()
   const [minutes, setMinutes] = useState(settings.freeMinutes)
   const [soundId, setSoundId] = useState(settings.soundId)
+
+  // 保存済みの曲が一覧に無い（削除・名前変更）場合は内蔵の雨音に戻す
+  useEffect(() => {
+    if (!soundId.startsWith('track:') || tracks.length === 0) return
+    const id = soundId.slice('track:'.length)
+    if (!tracks.some((t) => t.id === id)) setSoundId('rain')
+  }, [tracks, soundId])
 
   const durationSec = program.category === 'free' ? minutes * 60 : program.durationSec
 
@@ -83,7 +90,14 @@ export function Prepare({ program, settings, tracks, onStart, onBack }: Props) {
       </section>
 
       <div className="sticky-actions">
-        <button className="btn primary big full" onClick={() => onStart({ moodBefore: mood, durationSec, soundId })}>
+        <button
+          className="btn primary big full"
+          onClick={() => {
+            // iOS はタップ直後でないと音が出ないため、ここで音声コンテキストを起こす
+            audio.unlock()
+            onStart({ moodBefore: mood, durationSec, soundId })
+          }}
+        >
           はじめる
         </button>
       </div>

@@ -106,6 +106,8 @@ export function Player({ program, durationSec, settings, tracks, onFinish, onCan
   }
 
   function endNow() {
+    // 自然終了の直後に押された場合は二重処理しない
+    if (finishedRef.current) return
     finishedRef.current = true
     stopSpeaking()
     const ms = accRef.current + (paused ? 0 : performance.now() - startRef.current)

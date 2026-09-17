@@ -138,8 +138,8 @@ class AudioEngine {
 
   /** 環境音を開始。soundId は内蔵 ID か `track:<id>` */
   async start(soundId: string, tracks: Track[], volume: number): Promise<void> {
-    this.startToken++
     this.stop(0.6)
+    const token = this.startToken
     if (soundId === 'none') return
     const { ctx, master } = this.ensure()
     const gain = ctx.createGain()
@@ -157,9 +157,8 @@ class AudioEngine {
         gain.disconnect()
         return this.start('rain', tracks, volume)
       }
-      const token = this.startToken
       const buf = await this.trackBuffer(track)
-      // 読み込み中に別の音へ切り替えられた場合は破棄
+      // 読み込み中に別の音へ切り替えられた・停止された場合は破棄
       if (this.playing || token !== this.startToken) {
         gain.disconnect()
         return
@@ -313,6 +312,8 @@ class AudioEngine {
   }
 
   stop(fadeSec = 2) {
+    // 読み込み中の曲があっても、停止後に鳴り始めないよう無効化する
+    this.startToken++
     const p = this.playing
     if (!p || !this.ctx) return
     this.playing = null
