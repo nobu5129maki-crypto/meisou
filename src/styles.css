@@ -322,6 +322,15 @@ input[type='range'] {
   font-size: 0.88rem;
   margin: 0.6rem 0;
 }
+button.notice {
+  display: block;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
 .notice.warn {
   background: rgba(255, 195, 139, 0.12);
   border-color: rgba(255, 195, 139, 0.35);

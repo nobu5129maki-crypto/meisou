@@ -101,8 +101,10 @@ export function Player({ program, durationSec, settings, tracks, onFinish, onCan
   const progress = elapsed / durationSec
 
   function togglePause() {
-    if (!paused) stopSpeaking()
-    setPaused((p) => !p)
+    const next = !paused
+    if (next) stopSpeaking()
+    audio.setPaused(next)
+    setPaused(next)
   }
 
   function endNow() {

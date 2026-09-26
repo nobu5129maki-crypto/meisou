@@ -7,10 +7,12 @@ import { InstallHint } from './InstallHint'
 
 type Props = {
   data: AppData
+  notice?: string | null
+  onDismissNotice?: () => void
   onSelect: (p: Program) => void
 }
 
-export function Home({ data, onSelect }: Props) {
+export function Home({ data, notice, onDismissNotice, onSelect }: Props) {
   const { records, settings } = data
   const streak = currentStreak(records)
   const today = todaySeconds(records)
@@ -40,6 +42,12 @@ export function Home({ data, onSelect }: Props) {
           🔥 {streak}
         </div>
       </header>
+
+      {notice && (
+        <button type="button" className="notice" onClick={onDismissNotice}>
+          {notice}
+        </button>
+      )}
 
       <section className="card today">
         <ProgressRing progress={goal ? today / goal : 0} size={112} stroke={9} color={doneToday ? '#7fd1b9' : 'var(--accent)'}>

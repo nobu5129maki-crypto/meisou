@@ -1,4 +1,4 @@
-const CACHE = 'meisou-v2'
+const CACHE = 'meisou-v3'
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

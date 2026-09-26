@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { AppData, Settings, Track } from '../types'
 import { BUILTIN_SOUNDS, audio } from '../lib/audio'
 import { speak, speechSupported, stopSpeaking } from '../lib/speech'
@@ -16,6 +16,13 @@ type Props = {
 export function SettingsView({ data, tracks, onChange, onImport, onReset }: Props) {
   const s = data.settings
   const [previewing, setPreviewing] = useState(false)
+
+  useEffect(() => {
+    return () => {
+      audio.stop(0.4)
+      stopSpeaking()
+    }
+  }, [])
   const [msg, setMsg] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 

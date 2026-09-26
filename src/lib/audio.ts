@@ -25,6 +25,11 @@ class AudioEngine {
   private bufferCache = new Map<string, AudioBuffer>()
   private noiseCache = new Map<string, AudioBuffer>()
   private startToken = 0
+  /** ユーザーが一時停止している間は、ensure() が勝手に再生を再開しない */
+  private held = false
+  private ducked = false
+  private holdToken = 0
+  private level = 0.5
 
   private ensure() {
     if (!this.ctx) {
@@ -33,8 +38,39 @@ class AudioEngine {
       this.master.gain.value = 1
       this.master.connect(this.ctx.destination)
     }
-    if (this.ctx.state === 'suspended') void this.ctx.resume()
+    if (this.ctx.state === 'suspended' && !this.held) void this.ctx.resume()
     return { ctx: this.ctx, master: this.master! }
+  }
+
+  /**
+   * 再生中の環境音を一時停止・再開する。
+   * AudioContext を suspend すると、タイマーと同じ位置から音が続く。
+   */
+  setPaused(paused: boolean) {
+    this.held = paused
+    const ctx = this.ctx
+    if (!ctx) return
+    const token = ++this.holdToken
+    if (paused) {
+      if (ctx.state === 'running') {
+        void ctx.suspend().then(() => {
+          if (token !== this.holdToken || !this.held) void ctx.resume()
+        }).catch(() => {
+          if (token !== this.holdToken || !this.held) return
+          this.ducked = true
+          this.duckTo(0)
+        })
+      } else {
+        this.ducked = true
+        this.duckTo(0)
+      }
+    } else {
+      if (this.ducked) {
+        this.ducked = false
+        this.duckTo(this.level)
+      }
+      if (ctx.state === 'suspended') void ctx.resume()
+    }
   }
 
   /** ユーザー操作直後に呼び、iOS 等で AudioContext を起こす */
@@ -44,6 +80,7 @@ class AudioEngine {
 
   /** 開始・終了のベル（シンギングボウル風） */
   bell(volume = 0.7) {
+    this.held = false
     const { ctx, master } = this.ensure()
     const now = ctx.currentTime
     const base = 432
@@ -140,6 +177,7 @@ class AudioEngine {
   async start(soundId: string, tracks: Track[], volume: number): Promise<void> {
     this.stop(0.6)
     const token = this.startToken
+    this.level = volume
     if (soundId === 'none') return
     const { ctx, master } = this.ensure()
     const gain = ctx.createGain()
@@ -306,22 +344,38 @@ class AudioEngine {
   }
 
   setVolume(volume: number) {
-    if (!this.playing || !this.ctx) return
+    this.level = volume
+    if (!this.playing || !this.ctx || this.held) return
     this.playing.gain.gain.cancelScheduledValues(this.ctx.currentTime)
     this.playing.gain.gain.linearRampToValueAtTime(volume, this.ctx.currentTime + 0.3)
   }
 
+  private duckTo(volume: number) {
+    if (!this.playing || !this.ctx) return
+    const g = this.playing.gain.gain
+    const now = this.ctx.currentTime
+    g.cancelScheduledValues(now)
+    const current = g.value
+    g.setValueAtTime(current, now)
+    g.linearRampToValueAtTime(volume, now + 0.2)
+  }
+
   stop(fadeSec = 2) {
+    const wasHeld = this.held
+    this.held = false
+    this.ducked = false
     // 読み込み中の曲があっても、停止後に鳴り始めないよう無効化する
     this.startToken++
+    if (this.ctx?.state === 'suspended') void this.ctx.resume()
     const p = this.playing
     if (!p || !this.ctx) return
+    const fade = wasHeld ? Math.min(fadeSec, 0.25) : fadeSec
     this.playing = null
     if (p.timer) clearInterval(p.timer)
     const now = this.ctx.currentTime
     p.gain.gain.cancelScheduledValues(now)
     p.gain.gain.setValueAtTime(p.gain.gain.value, now)
-    p.gain.gain.linearRampToValueAtTime(0, now + fadeSec)
+    p.gain.gain.linearRampToValueAtTime(0, now + fade)
     setTimeout(() => {
       for (const s of p.sources) {
         try {
@@ -332,7 +386,7 @@ class AudioEngine {
         s.disconnect()
       }
       for (const n of p.nodes) n.disconnect()
-    }, fadeSec * 1000 + 100)
+    }, fade * 1000 + 100)
   }
 
   isPlaying() {

@@ -138,6 +138,15 @@ export const BADGES: Badge[] = [
   },
 ]
 
+/** 削除後も条件を満たすバッジだけ残す */
+export function retainBadges(records: SessionRecord[], prev: Record<string, string>): Record<string, string> {
+  const next: Record<string, string> = {}
+  for (const b of BADGES) {
+    if (prev[b.id] && b.check(records)) next[b.id] = prev[b.id]
+  }
+  return next
+}
+
 export function moodDelta(records: SessionRecord[]): { avg: number; count: number } {
   const both = records.filter((r) => r.moodBefore != null && r.moodAfter != null)
   if (!both.length) return { avg: 0, count: 0 }

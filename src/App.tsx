@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { AppData, Program, SessionRecord, Settings, Track } from './types'
 import { useAppData, emptyData } from './lib/storage'
-import { BADGES, currentStreak, todaySeconds, type Badge } from './lib/stats'
+import { BADGES, currentStreak, retainBadges, todaySeconds, type Badge } from './lib/stats'
 import { Home } from './components/Home'
 import { Stats } from './components/Stats'
 import { SettingsView } from './components/SettingsView'
@@ -22,6 +22,7 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('home')
   const [flow, setFlow] = useState<Flow>(null)
   const [tracks, setTracks] = useState<Track[]>([])
+  const [notice, setNotice] = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/audio/tracks.json', { cache: 'no-cache' })
@@ -92,7 +93,11 @@ export default function App() {
         settings={settingsForPlay}
         tracks={tracks}
         onFinish={handleFinish}
-        onCancel={() => setFlow(null)}
+        onCancel={() => {
+          setNotice('30秒未満のセッションは記録されません。')
+          setFlow(null)
+          setTab('home')
+        }}
       />
     )
   }
@@ -116,9 +121,25 @@ export default function App() {
   return (
     <div className="app">
       <main>
-        {tab === 'home' && <Home data={data} onSelect={(p) => setFlow({ stage: 'prepare', program: p })} />}
+        {tab === 'home' && (
+          <Home
+            data={data}
+            notice={notice}
+            onDismissNotice={() => setNotice(null)}
+            onSelect={(p) => {
+              setNotice(null)
+              setFlow({ stage: 'prepare', program: p })
+            }}
+          />
+        )}
         {tab === 'stats' && (
-          <Stats data={data} onDelete={(id) => setData({ ...data, records: data.records.filter((r) => r.id !== id) })} />
+          <Stats
+            data={data}
+            onDelete={(id) => {
+              const records = data.records.filter((r) => r.id !== id)
+              setData({ ...data, records, badges: retainBadges(records, data.badges) })
+            }}
+          />
         )}
         {tab === 'settings' && (
           <SettingsView
