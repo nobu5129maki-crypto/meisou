@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { AppData, Program, SessionRecord, Settings, Track } from './types'
 import { useAppData, emptyData } from './lib/storage'
 import { BADGES, currentStreak, retainBadges, todaySeconds, type Badge } from './lib/stats'
+import { publicUrl } from './lib/publicUrl'
 import { Home } from './components/Home'
 import { Stats } from './components/Stats'
 import { SettingsView } from './components/SettingsView'
@@ -25,9 +26,15 @@ export default function App() {
   const [notice, setNotice] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/audio/tracks.json', { cache: 'no-cache' })
+    fetch(publicUrl('audio/tracks.json'), { cache: 'no-cache' })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`tracks.json: ${r.status}`))))
-      .then((j: { tracks?: Track[] }) => setTracks(Array.isArray(j.tracks) ? j.tracks.filter((t) => t.id && t.file) : []))
+      .then((j: { tracks?: Track[] }) =>
+        setTracks(
+          Array.isArray(j.tracks)
+            ? j.tracks.filter((t) => t.id && t.file).map((t) => ({ ...t, file: publicUrl(t.file) }))
+            : [],
+        ),
+      )
       .catch(() => {
         /* 内蔵音のみで動作 */
       })
