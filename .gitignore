@@ -3,3 +3,7 @@ dist
 .vercel
 *.log
 .DS_Store
+*.htpasswd
+config.php
+.env
+.env.*

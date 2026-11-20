@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { publicUrl } from '../lib/publicUrl'
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>
@@ -91,7 +92,7 @@ export function InstallHint({ compact }: Props) {
   return (
     <section className="card install-card">
       <div className="install-row">
-        <img className="install-icon" src="/icons/icon-192.png" alt="" width={48} height={48} />
+        <img className="install-icon" src={publicUrl('icons/icon-192.png')} alt="" width={48} height={48} />
         <div className="install-body">
           <div className="today-title">ホーム画面に追加</div>
           {ios ? (
